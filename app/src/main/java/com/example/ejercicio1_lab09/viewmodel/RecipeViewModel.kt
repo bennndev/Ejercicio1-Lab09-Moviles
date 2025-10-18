@@ -1,4 +1,4 @@
-package com.example.ejercicio1_lab09.data.viewmodel
+package com.example.ejercicio1_lab09.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
