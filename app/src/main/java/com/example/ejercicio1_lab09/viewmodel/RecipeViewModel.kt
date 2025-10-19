@@ -32,7 +32,11 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
 
     fun loadRecipe(id: Int) {
         viewModelScope.launch {
-            _selected.value = try { repo.getRecipeById(id) } catch (e: Exception) { null }
+            _selected.value = try {
+                repo.getRecipeById(id)
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 
@@ -41,7 +45,9 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
             try {
                 val res = repo.searchRecipes(q)
                 _recipes.value = res.recipes
-            } catch (e: Exception) { }
+            } catch (e: Exception) {
+                _recipes.value = emptyList()
+            }
         }
     }
 
@@ -49,8 +55,10 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 val res = repo.getTags()
-                _tags.value = res.tags
-            } catch (e: Exception) { }
+                _tags.value = res.tags.distinct().sorted()
+            } catch (e: Exception) {
+                _tags.value = emptyList()
+            }
         }
     }
 
@@ -59,7 +67,9 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
             try {
                 val res = repo.getByTag(tag)
                 _recipes.value = res.recipes
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+                _recipes.value = emptyList()
+            }
         }
     }
 
@@ -67,5 +77,3 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
     suspend fun updateRecipe(id: Int, recipe: RecipeModel) = repo.updateRecipe(id, recipe)
     suspend fun deleteRecipe(id: Int) = repo.deleteRecipe(id)
 }
-
-

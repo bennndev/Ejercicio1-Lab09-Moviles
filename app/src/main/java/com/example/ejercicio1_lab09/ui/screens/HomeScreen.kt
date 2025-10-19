@@ -2,6 +2,7 @@ package com.example.ejercicio1_lab09.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -21,11 +22,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
     val recipes by viewModel.recipes.collectAsState()
+    val tags by viewModel.tags.collectAsState()
     var query by remember { mutableStateOf("") }
     var searched by remember { mutableStateOf(false) }
+    var selectedTag by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) { viewModel.loadRecipes() }
+    LaunchedEffect(Unit) {
+        viewModel.loadRecipes()
+        viewModel.loadTags()
+    }
 
     Scaffold(
         topBar = {
@@ -46,6 +52,7 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
                 .padding(padding)
                 .padding(16.dp)
         ) {
+            // 🟠 Campo de búsqueda
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
@@ -55,15 +62,14 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 🔍 Botón buscar
             Button(
                 onClick = {
                     scope.launch {
                         searched = true
-                        if (query.isBlank()) {
-                            viewModel.loadRecipes()
-                        } else {
-                            viewModel.search(query)
-                        }
+                        selectedTag = null
+                        if (query.isBlank()) viewModel.loadRecipes()
+                        else viewModel.search(query)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -71,8 +77,35 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
                 Text("Buscar")
             }
 
+            // 🏷️ Filtro por etiquetas
+            if (tags.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(tags) { tag ->
+                        FilterChip(
+                            selected = selectedTag == tag,
+                            onClick = {
+                                scope.launch {
+                                    if (selectedTag == tag) {
+                                        selectedTag = null
+                                        viewModel.loadRecipes()
+                                    } else {
+                                        selectedTag = tag
+                                        viewModel.loadByTag(tag)
+                                    }
+                                    query = ""
+                                    searched = true
+                                }
+                            },
+                            label = { Text(tag) }
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
+            // 📜 Lista de resultados
             when {
                 recipes.isEmpty() && searched -> {
                     Box(
@@ -80,13 +113,14 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No se encontraron resultados para \"$query\"",
+                            text = "No se encontraron resultados.",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
                 }
+
                 recipes.isEmpty() && !searched -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -99,6 +133,7 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
                         )
                     }
                 }
+
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
