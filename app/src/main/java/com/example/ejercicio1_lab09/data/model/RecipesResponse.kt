@@ -16,7 +16,4 @@ data class RecipesResponse(
     val limit: Int
 )
 
-data class TagsResponse(
-    @SerializedName("tags")
-    val tags: List<String>
-)
+typealias TagsResponse = List<String>

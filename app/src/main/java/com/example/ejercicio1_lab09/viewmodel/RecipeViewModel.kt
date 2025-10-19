@@ -54,13 +54,14 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
     fun loadTags() {
         viewModelScope.launch {
             try {
-                val res = repo.getTags()
-                _tags.value = res.tags.distinct().sorted()
+                val tagsList = repo.getTags()
+                _tags.value = tagsList
             } catch (e: Exception) {
                 _tags.value = emptyList()
             }
         }
     }
+
 
     fun loadByTag(tag: String) {
         viewModelScope.launch {

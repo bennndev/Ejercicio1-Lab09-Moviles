@@ -15,7 +15,7 @@ class RecipeRepository(
 
     suspend fun searchRecipes(q: String) = api.searchRecipes(q)
 
-    suspend fun getTags() = api.getAllTags()
+    suspend fun getTags(): List<String> = api.getAllTags()
 
     suspend fun getByTag(tag: String) = api.getRecipesByTag(tag)
 
