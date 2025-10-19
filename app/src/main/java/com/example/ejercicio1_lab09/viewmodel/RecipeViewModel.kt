@@ -67,9 +67,7 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
             try {
                 val res = repo.getByTag(tag)
                 _recipes.value = res.recipes
-            } catch (e: Exception) {
-                _recipes.value = emptyList()
-            }
+            } catch (e: Exception) {}
         }
     }
 

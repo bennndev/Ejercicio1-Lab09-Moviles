@@ -23,20 +23,21 @@ import kotlinx.coroutines.launch
 fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
     val recipes by viewModel.recipes.collectAsState()
     val tags by viewModel.tags.collectAsState()
+
     var query by remember { mutableStateOf("") }
     var searched by remember { mutableStateOf(false) }
     var selectedTag by remember { mutableStateOf<String?>(null) }
+
     val scope = rememberCoroutineScope()
 
+    // 🔄 Cargar recetas y etiquetas al iniciar
     LaunchedEffect(Unit) {
         viewModel.loadRecipes()
         viewModel.loadTags()
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Recetas") })
-        },
+        topBar = { TopAppBar(title = { Text("Recetas") }) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("add") },
@@ -46,13 +47,15 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
             }
         }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // 🟠 Campo de búsqueda
+
+            // 🔍 Campo de búsqueda
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
@@ -62,12 +65,12 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🔍 Botón buscar
+            // 🔘 Botón buscar
             Button(
                 onClick = {
                     scope.launch {
                         searched = true
-                        selectedTag = null
+                        selectedTag = null // Limpiar selección de tag al buscar
                         if (query.isBlank()) viewModel.loadRecipes()
                         else viewModel.search(query)
                     }
@@ -77,24 +80,29 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
                 Text("Buscar")
             }
 
-            // 🏷️ Filtro por etiquetas
+            // 🏷️ Filtro por etiquetas (chips)
             if (tags.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
+                Text("Filtrar por etiqueta:", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(tags) { tag ->
                         FilterChip(
                             selected = selectedTag == tag,
                             onClick = {
                                 scope.launch {
+                                    searched = true
                                     if (selectedTag == tag) {
+                                        // Si se vuelve a tocar, se quita el filtro
                                         selectedTag = null
                                         viewModel.loadRecipes()
                                     } else {
+                                        // Filtrar por tag
                                         selectedTag = tag
+                                        query = ""
                                         viewModel.loadByTag(tag)
                                     }
-                                    query = ""
-                                    searched = true
                                 }
                             },
                             label = { Text(tag) }
@@ -105,7 +113,7 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 📜 Lista de resultados
+            // 📜 Lista de recetas o mensajes de estado
             when {
                 recipes.isEmpty() && searched -> {
                     Box(
@@ -139,9 +147,9 @@ fun HomeScreen(navController: NavHostController, viewModel: RecipeViewModel) {
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(recipes) { r: RecipeModel ->
-                            RecipeCard(recipe = r) {
-                                navController.navigate("detail/${r.id}")
+                        items(recipes) { recipe: RecipeModel ->
+                            RecipeCard(recipe = recipe) {
+                                navController.navigate("detail/${recipe.id}")
                             }
                         }
                     }
