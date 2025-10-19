@@ -31,6 +31,5 @@ fun RecipeNavGraph(viewModel: com.example.ejercicio1_lab09.viewmodel.RecipeViewM
             val id = backStackEntry.arguments?.getInt("id") ?: 0
             RecipeDetailScreen(navController, viewModel, id)
         }
-        composable("tags") { TagsScreen(navController, viewModel) }
     }
 }
