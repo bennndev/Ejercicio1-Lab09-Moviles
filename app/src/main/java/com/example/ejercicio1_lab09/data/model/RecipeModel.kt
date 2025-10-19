@@ -13,7 +13,7 @@ data class RecipeModel(
     val ingredients: List<String> = emptyList(),
 
     @SerializedName("instructions")
-    val instructions: String? = null,
+    val instructions: List<String> = emptyList(),
 
     @SerializedName("image")
     val image: String? = null,
@@ -22,5 +22,5 @@ data class RecipeModel(
     val tags: List<String> = emptyList(),
 
     @SerializedName("mealType")
-    val mealType: String? = null
+    val mealType: List<String> = emptyList()
 )

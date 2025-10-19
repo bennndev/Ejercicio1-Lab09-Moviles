@@ -18,15 +18,20 @@ fun RecipeCard(recipe: RecipeModel, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(vertical = 6.dp)
             .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(6.dp)
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column {
+        Column(modifier = Modifier.padding(8.dp)) {
             recipe.image?.let {
-                AsyncImage(model = it, contentDescription = recipe.name, modifier = Modifier.fillMaxWidth().height(160.dp))
+                AsyncImage(
+                    model = it,
+                    contentDescription = recipe.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = recipe.name, modifier = Modifier.padding(8.dp))
+            Text(text = recipe.name)
         }
     }
 }
-

@@ -2,8 +2,11 @@ package com.example.ejercicio1_lab09.data.repository
 
 import com.example.ejercicio1_lab09.data.model.RecipeModel
 import com.example.ejercicio1_lab09.data.network.RecipeApiService
+import com.example.ejercicio1_lab09.data.network.RetrofitInstance
 
-class RecipeRepository(private val api: RecipeApiService) {
+class RecipeRepository(
+    private val api: RecipeApiService = RetrofitInstance.api
+    ) {
 
     suspend fun getRecipes(limit: Int = 20, skip: Int = 0) =
         api.getRecipes(limit, skip)

@@ -25,7 +25,7 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
                 val res = repo.getRecipes(limit, skip)
                 _recipes.value = res.recipes
             } catch (e: Exception) {
-
+                e.printStackTrace()
             }
         }
     }
@@ -67,3 +67,5 @@ class RecipeViewModel(private val repo: RecipeRepository) : ViewModel() {
     suspend fun updateRecipe(id: Int, recipe: RecipeModel) = repo.updateRecipe(id, recipe)
     suspend fun deleteRecipe(id: Int) = repo.deleteRecipe(id)
 }
+
+
